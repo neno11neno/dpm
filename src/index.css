@@ -1,0 +1,138 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+}
+
+header,
+footer {
+  flex-shrink: 0;
+}
+
+header {
+  margin-top: 0px !important;
+  background-color: #f5f5f5;
+}
+
+.logo-text {
+  margin:0px 0 0 10px;
+  text-decoration: none;
+  color: #4F4F4F;
+  font-weight: bold;
+}
+
+.logo-link:link {
+  color: #000;
+  text-decoration: none;
+}
+
+.logo-link:hover {
+  color: #000;
+  text-decoration: none;
+}
+
+.logo-link:active {
+  color: #000;
+  text-decoration: none;
+}
+
+.logo-link:visited {
+  color: #000;
+  text-decoration: none;
+}
+
+.appContainer{
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background-color: #f5f5f5;
+  overflow: auto;
+  background-image: url('../src/assets/img/bg-status.png');
+  max-height: calc(100vh - 143px);
+}
+
+@media print {
+  header {
+    display: none;
+  }
+
+  footer {
+    display: none
+  }
+}
+
+.popTitle {
+  background-color: #1976d2;
+  color: white;
+  text-align: center;
+  font-size: 1.5rex;
+  padding: 10px;
+}
+
+.detailTitle {
+  font-size: 16px !important;
+}
+
+.detailData {
+  font-size: 20px;
+  font-weight: bold;
+  color: #1976d2;
+
+}
+
+.tbbButton {
+  padding: 10px 20px !important;
+  min-width: 97.6px !important;
+}
+
+.MuiTable-root {
+  border: 1px solid black;
+}
+
+.MuiContainer-root {
+  max-width: 600px;
+  height: 100%;
+  border: 0.5px solid rgb(226, 226, 226);
+  background-color: rgb(255, 255, 255);
+  padding-top: 20px;
+  border-radius: 20px;
+}
+
+.mainBlock .MuiContainer-root .MuiPaper-root {
+  box-shadow: none !important;
+  padding-bottom: 50px !important;
+}
+
+.button-group {
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+}
+
+.css-kw13he-MuiDialogContent-root {
+  padding: 20px 24px 10px 24px !important;
+}
+
+@media (max-width: 1279px) {
+  .logo-text {
+    display: none;
+  }
+}
