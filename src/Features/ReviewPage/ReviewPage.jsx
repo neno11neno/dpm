@@ -15,6 +15,7 @@ import {
   Box,
 } from "@mui/material";
 import { useApi } from "../../api";
+import successImg from '../../assets/img/logo.svg';
 import DetailPopup from "../DetailPopup/DetailPopup";
 import { useLoading } from "../../context/LoadingContext";
 import { useSnackbar } from "notistack";
@@ -55,6 +56,7 @@ const ReviewPage = () => {
       setLoading
     );
     if (result.respCode === "0000") {
+      enqueueSnackbar(result.respMsg || "審核成功", { variant: "info" });
       setReports((prevReports) =>
         prevReports.map((report) =>
           report.serialNo === serialNo
@@ -64,6 +66,7 @@ const ReviewPage = () => {
       );
       fetchReports();
     } else {
+      enqueueSnackbar(result.respMsg || "審核失敗", { variant: "error" });
       setTimeout(() => {
         fetchReports();
       }, 2500);
@@ -91,7 +94,10 @@ const ReviewPage = () => {
     const result = await apiDownload(
       "/dwnRpt",
       { serialNo: selectedSerialNos },
-      "主管審核報表"
+      "主管審核報表",
+      true,
+      '檔案下載完成',
+      successImg
     );
     if (result.respCode !== "0000") {
       enqueueSnackbar("❌ 無法下載，請稍後再試", { variant: "error" });
@@ -99,13 +105,13 @@ const ReviewPage = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 5 }}>
+    <Container sx={{ mt: 5 }}>
       <Typography variant="h4" gutterBottom align="center" sx={{ mb: 3 }}>
         主管審核報表
       </Typography>
 
       <TableContainer component={Paper} sx={{ boxShadow: 3 }}>
-        <Table>
+        <Table sx={{ minWidth: 800 }}>
           <TableHead>
             <TableRow>
               <TableCell />
@@ -122,7 +128,7 @@ const ReviewPage = () => {
               <TableRow>
                 <TableCell colSpan={7} align="center">
                   <Typography variant="body1" sx={{ py: 3 }}>
-                    <p style={{fontSize: '1.3rem' }}>
+                    <p style={{ fontSize: "1.3rem" }}>
                       {respMsg || "查無資料"}
                     </p>
                   </Typography>

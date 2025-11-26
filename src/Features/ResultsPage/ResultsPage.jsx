@@ -1,12 +1,26 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
-  Container, Typography, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, Button, Box, Checkbox,
-  Dialog, DialogTitle, DialogContent, DialogActions
-} from '@mui/material';
-import { useLocation, useNavigate, Navigate } from 'react-router-dom';
-import { useSnackbar } from 'notistack';
-import { useApi } from '../../api';
+  Container,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Box,
+  Checkbox,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
+import { useLocation, useNavigate, Navigate } from "react-router-dom";
+import { useSnackbar } from "notistack";
+import { useApi } from "../../api";
+import successImg from '../../assets/img/PNG_Hokii_Sucess.png';
 
 const ResultsPage = () => {
   const location = useLocation();
@@ -30,14 +44,21 @@ const ResultsPage = () => {
 
   const handleDownloadExcel = async () => {
     if (!selectedSerialNo) {
-      enqueueSnackbar('請選擇一筆要下載的資料', { variant: 'error' });
+      enqueueSnackbar("請選擇一筆要下載的資料", { variant: "error" });
       return;
     }
 
-    const result = await apiDownload('/dwnRpt', { serialNo: selectedSerialNo }, '報表查詢結果');
+    const result = await apiDownload(
+      "/dwnRpt",
+      { serialNo: selectedSerialNo },
+      "報表查詢結果",
+      true,
+      '檔案下載完成',
+      successImg
+    );
 
-    if (result.respCode !== '0000') {
-      enqueueSnackbar('❌ 無法下載，請稍後再試', { variant: 'error' });
+    if (result.respCode !== "0000") {
+      enqueueSnackbar("❌ 無法下載，請稍後再試", { variant: "error" });
     }
   };
 
@@ -60,10 +81,10 @@ const ResultsPage = () => {
       </Typography>
 
       <Typography variant="caption" color="textSecondary" sx={{ mt: 1, mb: 1 }}>
-        👉 表格欄位較多，已縮減顯示，點選「查看詳細」可瀏覽完整內容
+        👉 表格欄位較多，已縮減顯示，點選「案件編號」可瀏覽完整內容
       </Typography>
 
-      <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+      <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
         <Table sx={{ minWidth: 800 }}>
           <TableHead>
             <TableRow>
@@ -72,7 +93,8 @@ const ResultsPage = () => {
               <TableCell>經辦人員</TableCell>
               <TableCell>報表代號</TableCell>
               <TableCell>上傳狀態</TableCell>
-              <TableCell>操作</TableCell>
+              <TableCell>審核狀態</TableCell>
+              <TableCell>央行報送狀態</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -93,15 +115,17 @@ const ResultsPage = () => {
                       onChange={() => handleCheckboxChange(row.serialNo)}
                     />
                   </TableCell>
-                  <TableCell>{row.serialNo}</TableCell>
+                  <TableCell
+                    sx={{ color: "primary.main", cursor: "pointer" }}
+                    onClick={() => handleRowClick(row)}
+                  >
+                    {row.serialNo}
+                  </TableCell>
                   <TableCell>{row.rptMaker}</TableCell>
                   <TableCell>{row.rptCode}</TableCell>
                   <TableCell>{row.uploadStatus}</TableCell>
-                  <TableCell>
-                    <Button size="small" onClick={() => handleRowClick(row)}>
-                      查看詳細
-                    </Button>
-                  </TableCell>
+                  <TableCell>{row.reviewStatus}</TableCell>
+                  <TableCell>{row.declareStatus}</TableCell>
                 </TableRow>
               ))
             )}
@@ -109,35 +133,121 @@ const ResultsPage = () => {
         </Table>
       </TableContainer>
 
-      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2 }}>
-        <Button variant="contained" onClick={handleBack} sx={{ backgroundColor: '#6c757d' }}>
+      <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end", mt: 2 }}>
+        <Button
+          variant="contained"
+          onClick={handleBack}
+          sx={{ backgroundColor: "#6c757d" }}
+        >
           回上一頁
         </Button>
-        <Button variant="contained" onClick={handleDownloadExcel} color="primary">
+        <Button
+          variant="contained"
+          onClick={handleDownloadExcel}
+          color="primary"
+        >
           下載檔案(選單筆)
         </Button>
       </Box>
 
       {/* 詳細資料 Dialog */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>報表詳細資訊</DialogTitle>
         <DialogContent dividers>
-          {selectedRow && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <Typography>案件編號: {selectedRow.serialNo}</Typography>
-              <Typography>經辦人員:{selectedRow.rptMaker}</Typography>
-              <Typography>報表代號：{selectedRow.rptCode}</Typography>
-              <Typography>上傳狀態：{selectedRow.uploadStatus}</Typography>
-              <Typography>報表版號: {selectedRow.rptVer}</Typography>
-              <Typography>上傳時間：{selectedRow.uploadTime}</Typography>
-              <Typography>審核人員：{selectedRow.rptChecker}</Typography>
-              <Typography>審核狀態：{selectedRow.reviewStatus}</Typography>
-              <Typography>審核時間：{selectedRow.reviewTime}</Typography>
-              <Typography>申報狀態：{selectedRow.declareStatus}</Typography>
-              <Typography>申報時間：{selectedRow.declareTime}</Typography>
-              <Typography>驗證狀態：{selectedRow.validStatusName}</Typography>
-              <Typography>驗證訊息：{selectedRow.validMsg}</Typography>
-            </Box>
+          {selectedRow ? (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 2,
+                  mb: 2,
+                }}
+              >
+                <Typography sx={{ width: "calc(50% - 8px)" }}>
+                  案件編號: {selectedRow.serialNo}
+                </Typography>
+                <Typography sx={{ width: "calc(50% - 8px)" }}>
+                  經辦人員:{selectedRow.rptMaker}
+                </Typography>
+                <Typography sx={{ width: "calc(50% - 8px)" }}>
+                  報表代號：{selectedRow.rptCode}
+                </Typography>
+                <Typography sx={{ width: "calc(50% - 8px)" }}>
+                  報表版號: {selectedRow.rptVer}
+                </Typography>
+                <Typography sx={{ width: "calc(50% - 8px)" }}>
+                  上傳狀態：{selectedRow.uploadStatus}
+                </Typography>
+                <Typography sx={{ width: "calc(50% - 8px)" }}>
+                  上傳時間：{selectedRow.uploadTime}
+                </Typography>
+                <Typography sx={{ width: "calc(50% - 8px)" }}>
+                  上傳檢核訊息：{selectedRow.uploadMsg}
+                </Typography>
+              </Box>
+              <hr></hr>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 2,
+                  mb: 2,
+                }}
+              >
+                <Typography sx={{ width: "calc(50% - 8px)" }}>
+                  審核人員：{selectedRow.rptChecker}
+                </Typography>
+                <Typography sx={{ width: "calc(50% - 8px)" }}>
+                  審核時間：{selectedRow.reviewTime}
+                </Typography>
+                <Typography sx={{ width: "calc(50% - 8px)" }}>
+                  審核狀態：{selectedRow.reviewStatus}
+                </Typography>
+              </Box>
+              <hr></hr>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 2,
+                  mb: 2,
+                }}
+              >
+                <Typography sx={{ width: "calc(50% - 8px)" }}>
+                  申報狀態：{selectedRow.declareStatus}
+                </Typography>
+                <Typography sx={{ width: "calc(50% - 8px)" }}>
+                  申報訊息：{selectedRow.declareMsg}
+                </Typography>
+                <Typography sx={{ width: "calc(50% - 8px)" }}>
+                  申報時間：{selectedRow.declareTime}
+                </Typography>
+              </Box>
+              <hr></hr>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 2,
+                  mb: 2,
+                }}
+              >
+              <Typography sx={{ width: "calc(50% - 8px)" }}>
+                  央行檢核狀態：{selectedRow.validStatusName}
+                </Typography>
+                <Typography sx={{ width: "calc(50% - 8px)" }}>
+                  央行檢核訊息：{selectedRow.validMsg}
+                </Typography>
+              </Box>
+            </>
+          ) : (
+            <Typography>找不到詳細資料</Typography>
           )}
         </DialogContent>
         <DialogActions>

@@ -29,7 +29,7 @@ export const useApi = () => {
     return headers;
   };
 
-  const apiGet = async (endpoint, setLoading) => {
+  const apiGet = async (endpoint, setLoading, showSuccessPopup = false, successMsg = '', successImage = '') => {
     const headers = getHeaders();
     if (!headers) return { respCode: '9999' };
 
@@ -44,6 +44,9 @@ export const useApi = () => {
       const result = await response.json();
 
       if (result.respCode === '0000') {
+        if (showSuccessPopup) {
+          showError({ code: result.respCode, message: successMsg || result.respMsg || '操作成功', variant: 'success', image: successImage });
+        }
         return result;
       } else {
         showError({
@@ -61,7 +64,7 @@ export const useApi = () => {
     }
   };
 
-  const apiPost = async (endpoint, data = {}, setLoading) => {
+  const apiPost = async (endpoint, data = {}, setLoading, showSuccessPopup = false, successMsg = '', successImage = '') => {
     const headers = getHeaders();
     if (!headers) return { respCode: '9999' };
 
@@ -75,8 +78,14 @@ export const useApi = () => {
       });
 
       const result = await response.json();
-
+      console.warn('result',result)
       if (result.respCode === '0000') {
+        console.warn('進入0000')
+        console.warn('showSuccessPopup',showSuccessPopup)
+        if (showSuccessPopup) {
+          showError({ code: result.respCode, message: successMsg || result.respMsg || '操作成功', variant: 'success', image: successImage });
+          console.warn('顯示成功R')
+        }
         return result;
       } else {
         showError({
@@ -94,7 +103,7 @@ export const useApi = () => {
     }
   };
 
-  const apiUploadPost = async (endpoint, formData, setLoading) => {
+  const apiUploadPost = async (endpoint, formData, setLoading, showSuccessPopup = false, successMsg = '', successImage = '') => {
     const headers = getHeaders(false);
     if (!headers) return { respCode: '9999' };
 
@@ -110,6 +119,9 @@ export const useApi = () => {
       const result = await response.json();
 
       if (result.respCode === '0000') {
+        if (showSuccessPopup) {
+          showError({ code: result.respCode, message: successMsg || result.respMsg || '操作成功', variant: 'success', image: successImage });
+        }
         return result;
       } else {
         showError({
@@ -130,7 +142,7 @@ export const useApi = () => {
     }
   };
 
-  const apiDownload = async (endpoint, data = {}, fallbackFilename = 'download') => {
+  const apiDownload = async (endpoint, data = {}, fallbackFilename = 'download', showSuccessPopup = false, successMsg = '', successImage = '') => {
     const headers = getHeaders();
     if (!headers) return { respCode: '9999' };
 
@@ -173,6 +185,10 @@ export const useApi = () => {
       a.click();
       window.URL.revokeObjectURL(url);
 
+      if (showSuccessPopup) {
+        // show friendly success message via ErrorContext (re-using popup component)
+        showError({ code: '0000', message: successMsg || `${fallbackFilename} 下載完成`, variant: 'success', image: successImage });
+      }
       return { respCode: '0000' };
     } catch (error) {
       console.error(`❌ API DOWNLOAD 錯誤 (${endpoint}):`, error);

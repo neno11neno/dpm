@@ -71,14 +71,6 @@ const BadPage = () => {
         >
           待審案件查詢
         </Button>
-        <Button
-          variant="contained"
-          component={Link}
-          to="/UploadTestPage"
-          sx={{ bgcolor: '	#C07AB8', fontSize: '12px' }}
-        >
-          上傳申請報表(你們都要給我錢💰🧧)
-        </Button>
       </Box>
 
       {currentUser && (

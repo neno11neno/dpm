@@ -14,10 +14,7 @@ const DetailPopup = ({ open, onClose, report }) => {
       <DialogContent>
         <Box
           sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 2, // 元素間距
-            mb: 2,
+            display: 'flex',flexWrap: 'wrap',gap: 2,mb: 2,
           }}
         >
           <Typography variant="h6" sx={{ width: '100%' }}>

@@ -1,6 +1,6 @@
 import './Header.css';
 import logoImg from '../../assets/img/logo.svg';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   AppBar, Toolbar, Button, Typography, useMediaQuery,
   Drawer, IconButton, Box, Stack

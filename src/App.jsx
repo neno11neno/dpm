@@ -13,7 +13,6 @@ import LogoutPage from "./Features/LogoutPage/LogoutPage";
 import ReviewPage from "./Features/ReviewPage/ReviewPage";
 import HomePage from "./Features/HomePage/HomePage";
 import BadPage from "./Features/BadPage/BadPage";
-import UploadTestPage from "./Features/UploadTestPage/UploadTestPage";
 
 // Context
 import { LoadingProvider } from "./context/LoadingContext";
@@ -33,7 +32,6 @@ const AppRoutes = () => {
             <Route path="/HomePage" element={<HomePage />} />
             <Route path="/QueryPage" element={<QueryPage />} />
             <Route path="/UploadPage" element={<UploadPage />} />
-            <Route path="/UploadTestPage" element={<UploadTestPage />} />
             <Route path="/ResultsPage" element={<ResultsPage />} />
             <Route path="/LogoutPage" element={<LogoutPage />} />
             <Route path="/BadPage" element={<BadPage />} />
