@@ -20,7 +20,6 @@ import {
 import { useLocation, useNavigate, Navigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { useApi } from "../../api";
-import successImg from '../../assets/img/PNG_Hokii_Sucess.png';
 
 const ResultsPage = () => {
   const location = useLocation();
@@ -51,10 +50,7 @@ const ResultsPage = () => {
     const result = await apiDownload(
       "/dwnRpt",
       { serialNo: selectedSerialNo },
-      "報表查詢結果",
-      true,
-      '檔案下載完成',
-      successImg
+      "報表查詢結果"
     );
 
     if (result.respCode !== "0000") {

@@ -1,15 +1,14 @@
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Typography, Box } from '@mui/material';
 import errorimg from '../../assets/img/PNG_Hokii.png';
-import successimg from '../../assets/img/PNG_Hokii_Sucess.png';
 
 const ErrorPopup = ({ error, open, onClose }) => {
     if (!error) return null;
 
     return (
         <Dialog open={open} onClose={onClose}>
-                <DialogTitle className='popTitle'>
-                    {error.variant === 'success' ? '操作完成' : '系統回覆訊息'}
-                </DialogTitle>
+            <DialogTitle className='popTitle'>
+                系統回覆訊息
+            </DialogTitle>
             <DialogContent>
                 <Box
                     sx={{
@@ -31,15 +30,15 @@ const ErrorPopup = ({ error, open, onClose }) => {
 
                     <Box>
                         <img
-                            src={error.image || (error.variant === 'success' ? successimg : errorimg)}
-                            alt={error.variant === 'success' ? 'Success' : 'Hookie'}
+                            src={errorimg}
+                            alt="Hookie"
                             style={{ width: '200px', height: '200px' }}
                         />
                     </Box>
                 </Box>
             </DialogContent>
             <DialogActions sx={{ justifyContent: 'center' }}>
-                <Button onClick={onClose} color={error.variant === 'success' ? 'success' : 'primary'} variant="contained" sx={{ fontSize: '1.2rem', width: '200px' }}>
+                <Button onClick={onClose} color="primary" variant="contained" sx={{ fontSize: '1.2rem', width: '200px' }}>
                     關閉
                 </Button>
             </DialogActions>

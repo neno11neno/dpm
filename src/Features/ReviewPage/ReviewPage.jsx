@@ -15,7 +15,6 @@ import {
   Box,
 } from "@mui/material";
 import { useApi } from "../../api";
-import successImg from '../../assets/img/logo.svg';
 import DetailPopup from "../DetailPopup/DetailPopup";
 import { useLoading } from "../../context/LoadingContext";
 import { useSnackbar } from "notistack";
@@ -94,10 +93,7 @@ const ReviewPage = () => {
     const result = await apiDownload(
       "/dwnRpt",
       { serialNo: selectedSerialNos },
-      "主管審核報表",
-      true,
-      '檔案下載完成',
-      successImg
+      "主管審核報表"
     );
     if (result.respCode !== "0000") {
       enqueueSnackbar("❌ 無法下載，請稍後再試", { variant: "error" });
