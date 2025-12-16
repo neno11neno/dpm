@@ -62,11 +62,9 @@ const WelcomePage = () => {
         } else if (data?.respCode === "0003") {
           setErrorMessage("您無此權限。");
         } else {
-          console.warn("API 回應異常:", data);
           setErrorMessage("無法取得員工資料，請從 Eportal 重新嘗試。");
         }
       } catch (error) {
-        console.error("API 錯誤:", error);
       } finally {
         setLoading(false);
       }

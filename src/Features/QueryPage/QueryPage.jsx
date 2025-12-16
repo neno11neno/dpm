@@ -1,17 +1,21 @@
 import { useState } from "react";
 import {
   Container,
-  TextField,
   Button,
   Grid,
   Typography,
   Box,
   Stack,
 } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import { useApi } from "../../api";
 import { useLoading } from "../../context/LoadingContext";
 import { useSnackbar } from "notistack";
+import 'dayjs/locale/zh-tw';
 
 const QueryPage = () => {
   const navigate = useNavigate();
@@ -22,6 +26,8 @@ const QueryPage = () => {
   const today = new Date();
   const oneYearAgo = new Date();
   oneYearAgo.setFullYear(today.getFullYear() - 1);
+  // 僅顯示兩年：當前年與前兩年（從前兩年年初開始）
+  const twoYearMinDate = new Date(today.getFullYear() - 2, 0, 1);
 
   const formatDate = (date) => date.toISOString().split("T")[0];
   const [startDate, setStartDate] = useState(formatDate(oneYearAgo));
@@ -38,14 +44,20 @@ const QueryPage = () => {
     const start = new Date();
 
     if (days === "today") {
+      // 今天：起訖都是今天
+      start.setTime(end.getTime());
     } else if (days === 365) {
       start.setFullYear(end.getFullYear() - 1);
     } else {
       start.setDate(end.getDate() - (days - 1));
     }
 
-    setStartDate(formatDate(start));
-    setEndDate(formatDate(end));
+    // 限制在兩年內（避免快捷區間超出）
+    const safeStart = start < twoYearMinDate ? twoYearMinDate : start;
+    const safeEnd = end > today ? today : end;
+
+    setStartDate(formatDate(safeStart));
+    setEndDate(formatDate(safeEnd));
   };
 
   const handleSubmit = async (e) => {
@@ -124,7 +136,7 @@ const QueryPage = () => {
           color="textSecondary"
           sx={{ mb: 2 }}
         >
-          查詢區間最多一年
+          提供查詢近兩年申報紀錄，查詢區間最長一年
         </Typography>
 
         <Stack
@@ -163,47 +175,63 @@ const QueryPage = () => {
           </Button>
         </Stack>
 
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="案件日期起日"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                variant="outlined"
-                inputProps={{ max: formatDate(new Date()) }}
-              />
-            </Grid>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-tw">
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <DatePicker
+                  label="案件日期起日"
+                  value={dayjs(startDate)}
+                  onChange={(newValue) => {
+                    setStartDate(
+                      newValue ? newValue.format("YYYY-MM-DD") : ""
+                    );
+                  }}
+                  minDate={dayjs(twoYearMinDate)}
+                  maxDate={dayjs()} // 今天
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                    },
+                  }}
+                  format="YYYY/MM/DD"
+                />
+              </Grid>
 
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="案件日期迄日"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                variant="outlined"
-                inputProps={{ max: formatDate(new Date()) }}
-              />
-            </Grid>
+              <Grid item xs={6}>
+                <DatePicker
+                  label="案件日期迄日"
+                  value={dayjs(endDate)}
+                  onChange={(newValue) => {
+                    setEndDate(
+                      newValue ? newValue.format("YYYY-MM-DD") : ""
+                    );
+                  }}
+                  minDate={dayjs(twoYearMinDate)}
+                  maxDate={dayjs()}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                    },
+                  }}
+                  format="YYYY/MM/DD"
+                />
+              </Grid>
 
-            <Grid item xs={12}>
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "查詢中..." : "查詢"}
-              </Button>
+              <Grid item xs={12}>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "查詢中..." : "查詢"}
+                </Button>
+              </Grid>
             </Grid>
-          </Grid>
-        </form>
+          </form>
+        </LocalizationProvider>
       </Box>
     </Container>
   );

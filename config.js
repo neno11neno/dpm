@@ -6,7 +6,7 @@ const CONFIG = {
     API_BASE_URL: '/cbcapi',
   },
   production: {
-    API_BASE_URL: 'https://10.17.20.224/cbcapi',
+    API_BASE_URL: 'https://127.0.0.1:8443/cbcapi',
   },
 };
 

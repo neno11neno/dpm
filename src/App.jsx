@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Router, Routes, Route } from "react-router-dom";
 import { SnackbarProvider } from "notistack";
 
 // Page & Components
@@ -75,7 +75,7 @@ function App() {
       <SnackbarProvider maxSnack={3} autoHideDuration={3000}>
         <ErrorProvider>
           <LoadingProvider>
-            <Router>
+            <Router basename='/cbcweb'>
               <AuthProvider>
                 <AppRoutes />
               </AuthProvider>

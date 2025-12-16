@@ -25,7 +25,7 @@ const ReviewPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedSerialNos, setSelectedSerialNos] = useState(null);
   const [respMsg, setRespMsg] = useState("");
-  const { apiPost, apiDownload } = useApi();
+  const { apiPost, apiDownload, apiPostDeclare } = useApi();
   const { setLoading } = useLoading();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -44,12 +44,11 @@ const ReviewPage = () => {
     setReports(data);
     setRespMsg(result.respMsg || "");
     if (!Array.isArray(result.respData)) {
-      console.warn("⚠️ API 回傳不是陣列，respData:", result.respData);
     }
   };
 
   const handleReview = async (serialNo, action) => {
-    const result = await apiPost(
+    const result = await apiPostDeclare(
       `/declare`,
       { serialNo, reviewStatus: action },
       setLoading
@@ -87,7 +86,7 @@ const ReviewPage = () => {
 
   const handleDownload = async () => {
     if (selectedSerialNos.length === 0) {
-      enqueueSnackbar("請至少選擇一筆資料進行下載", { variant: "warning" });
+      enqueueSnackbar("請選擇一筆要下載的資料", { variant: "error" });
       return;
     }
     const result = await apiDownload(
@@ -195,7 +194,7 @@ const ReviewPage = () => {
 
       <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
         <Button variant="contained" color="primary" onClick={handleDownload}>
-          下載選取報表
+          下載檔案(選單筆)
         </Button>
       </Box>
 

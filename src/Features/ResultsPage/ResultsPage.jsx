@@ -187,7 +187,6 @@ const ResultsPage = () => {
                   上傳檢核訊息：{selectedRow.uploadMsg}
                 </Typography>
               </Box>
-              <hr></hr>
               <Box
                 sx={{
                   display: "flex",
@@ -206,7 +205,6 @@ const ResultsPage = () => {
                   審核狀態：{selectedRow.reviewStatus}
                 </Typography>
               </Box>
-              <hr></hr>
               <Box
                 sx={{
                   display: "flex",
@@ -225,7 +223,6 @@ const ResultsPage = () => {
                   申報時間：{selectedRow.declareTime}
                 </Typography>
               </Box>
-              <hr></hr>
               <Box
                 sx={{
                   display: "flex",
