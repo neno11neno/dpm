@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react";
 import { Typography, Container, Paper } from "@mui/material";
-import helloimg from '../../assets/img/PNG_Hokii_Hello.png';
+import helloimg from "../../assets/img/PNG_Hokii_Hello.png";
+import { useAuth } from "../../context/AuthContext"; 
 
 const HomePage = () => {
+  const { authData } = useAuth();
   const [employeeData, setEmployeeData] = useState(null);
 
   useEffect(() => {
-    const empNo = sessionStorage.getItem("empNo");
-    const empName = sessionStorage.getItem("empName");
-
-    if (empNo && empName) {
-      setEmployeeData({ empNo, empName });
+    if (authData?.empNo && authData?.empName) {
+      setEmployeeData({
+        empNo: authData.empNo,
+        empName: authData.empName,
+      });
+    } else {
+      setEmployeeData(null);
     }
-  }, []);
+  }, [authData]);
 
   return (
     <Container maxWidth="sm" style={{ paddingTop: "50px" }}>
@@ -21,7 +25,7 @@ const HomePage = () => {
           <>
             <img
               src={helloimg}
-              alt="Hookie"
+              alt="Hokii"
               style={{ width: "200px", height: "200px" }}
             />
             <Typography variant="h4" color="primary" gutterBottom>

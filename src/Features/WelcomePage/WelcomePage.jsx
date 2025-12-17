@@ -18,32 +18,27 @@ const WelcomePage = () => {
   const { setAuthData } = useAuth();
   const [errorMessage, setErrorMessage] = useState("");
 
+  const generateSHA256 = async (input) => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(input);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(hashBuffer))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  };
+
   useEffect(() => {
-    const empNo = sessionStorage.getItem("empNo");
-    const empAuth = sessionStorage.getItem("empAuth");
-    const empName = sessionStorage.getItem("empName");
-
-    if (empNo && empAuth) {
-      setEmployeeData({ empNo, empAuth, empName: empName || "" });
-      setLoading(false);
-
-      setTimeout(() => {
-        navigate("/HomePage");
-      }, 1000);
-      return;
-    }
-
     const fetchEmployeeData = async (authCode) => {
       try {
         const payload = encodeURIComponent(authCode);
         const url = `${API_BASE_URL}/ssoAuth?authCode=${payload}`;
         const response = await fetch(url);
-
         const data = await response.json();
+
         if (data?.respCode === "0000" && data.respData) {
           const { empNo, empName, empAuth } = data.respData;
-          setEmployeeData({ empNo, empName, empAuth });
 
+          setEmployeeData({ empNo, empName, empAuth });
           const today = new Date();
           const formattedDate = today
             .toISOString()
@@ -51,11 +46,7 @@ const WelcomePage = () => {
             .replace(/-/g, "");
           const hashValue = await generateSHA256(formattedDate + empNo);
 
-          sessionStorage.setItem("empNo", btoa(empNo));
-          sessionStorage.setItem("empName", btoa(empName));
-          sessionStorage.setItem("X-API-KEY", btoa(hashValue));
-          sessionStorage.setItem("empAuth", btoa(empAuth));
-          setAuthData(empNo, empAuth);
+          setAuthData(empNo, empAuth, empName, hashValue);
 
           setTimeout(() => {
             navigate("/HomePage");
@@ -66,6 +57,7 @@ const WelcomePage = () => {
           setErrorMessage("無法取得員工資料，請從 Eportal 重新嘗試。");
         }
       } catch (error) {
+        setErrorMessage("系統異常，請稍後再試。");
       } finally {
         setLoading(false);
       }
@@ -78,17 +70,9 @@ const WelcomePage = () => {
       fetchEmployeeData(authCode);
     } else {
       setLoading(false);
+      setErrorMessage("缺少 authCode，請從 Eportal 重新進入。");
     }
   }, [location.search, navigate]);
-
-  const generateSHA256 = async (input) => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(input);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(hashBuffer))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-  };
 
   return (
     <Container maxWidth="sm" style={{ paddingTop: "50px" }}>

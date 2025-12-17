@@ -1,13 +1,15 @@
 import { API_BASE_URL } from '../config';
 import { useError } from './context/ErrorContext';
 import { ERROR_CODE_MAP } from './constants/errorMessages';
+import { useAuth } from './context/AuthContext';
 
 export const useApi = () => {
     const { showError, showSuccess } = useError();
+    const { authData } = useAuth(); 
 
     const getHeaders = (isJson = true) => {
-        const empNo = sessionStorage.getItem('empNo');
-        const apiKey = sessionStorage.getItem('X-API-KEY');
+        const empNo = authData?.empNo;
+        const apiKey = authData?.apiKey;
 
         if (!empNo || !apiKey) {
             showError({
@@ -18,7 +20,7 @@ export const useApi = () => {
         }
 
         const headers = {
-            'empNo': empNo,
+            empNo,
             'X-API-KEY': apiKey,
         };
 
@@ -29,7 +31,7 @@ export const useApi = () => {
         return headers;
     };
 
-    const apiGet = async(endpoint, setLoading) => {
+    const apiGet = async (endpoint, setLoading) => {
         const headers = getHeaders();
         if (!headers) return { respCode: '9999' };
 
@@ -53,14 +55,17 @@ export const useApi = () => {
                 return result;
             }
         } catch (error) {
-            showError({ code: '9999', message: error.message || ERROR_CODE_MAP['9999'] });
+            showError({
+                code: '9999',
+                message: error.message || ERROR_CODE_MAP['9999'],
+            });
             return { respCode: '9999', respMsg: error.message };
         } finally {
             if (setLoading) setLoading(false);
         }
     };
 
-    const apiPost = async(endpoint, data = {}, setLoading) => {
+    const apiPost = async (endpoint, data = {}, setLoading) => {
         const headers = getHeaders();
         if (!headers) return { respCode: '9999' };
 
@@ -85,27 +90,45 @@ export const useApi = () => {
                 return result;
             }
         } catch (error) {
-            showError({ code: '9999', message: error.message || ERROR_CODE_MAP['9999'] });
+            showError({
+                code: '9999',
+                message: error.message || ERROR_CODE_MAP['9999'],
+            });
             return { respCode: '9999', respMsg: error.message };
         } finally {
             if (setLoading) setLoading(false);
         }
     };
 
-    const apiUploadPost = async(endpoint, formData, setLoading, showSuccessPopup = false, successMsg = '', successImage = '') => {
+    const apiUploadPost = async (
+        endpoint,
+        formData,
+        setLoading,
+        showSuccessPopup = false,
+        successMsg = '',
+        successImage = ''
+    ) => {
         const headers = getHeaders(false);
         if (!headers) return { respCode: '9999' };
+
         if (setLoading) setLoading(true);
+
         try {
             const response = await fetch(`${API_BASE_URL}${endpoint}`, {
                 method: 'POST',
                 headers,
                 body: formData,
             });
+
             const result = await response.json();
+
             if (result.respCode === '0000') {
                 if (showSuccessPopup) {
-                    showSuccess({ code: result.respCode, message: successMsg || result.respMsg || '上傳成功', image: successImage });
+                    showSuccess({
+                        code: result.respCode,
+                        message: successMsg || result.respMsg || '上傳成功',
+                        image: successImage,
+                    });
                 }
                 return result;
             } else {
@@ -126,7 +149,7 @@ export const useApi = () => {
         }
     };
 
-    const apiDownload = async(endpoint, data = {}, fallbackFilename = 'download') => {
+    const apiDownload = async (endpoint, data = {}, fallbackFilename = 'download') => {
         const headers = getHeaders();
         if (!headers) return { respCode: '9999' };
 
@@ -153,12 +176,6 @@ export const useApi = () => {
             const fileNameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
             if (fileNameMatch && fileNameMatch[1]) {
                 filename = decodeURIComponent(fileNameMatch[1].replace(/['"]/g, ''));
-            } else {
-                if (contentType.includes('text/plain')) {
-                    filename += '.txt';
-                } else if (contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
-                    filename += '.xlsx';
-                }
             }
 
             const blob = await response.blob();
@@ -171,24 +188,42 @@ export const useApi = () => {
 
             return { respCode: '0000' };
         } catch (error) {
-            showError({ code: '9999', message: error.message || ERROR_CODE_MAP['9999'] });
+            showError({
+                code: '9999',
+                message: error.message || ERROR_CODE_MAP['9999'],
+            });
             return { respCode: '9999', respMsg: error.message };
         }
     };
 
-    const apiPostDeclare = async(endpoint, data = {}, setLoading, showSuccessPopup = false, successMsg = '', successImage = '') => {
+    const apiPostDeclare = async (
+        endpoint,
+        data = {},
+        setLoading,
+        showSuccessPopup = false,
+        successMsg = '',
+        successImage = ''
+    ) => {
         const headers = getHeaders();
         if (!headers) return { respCode: '9999' };
+
         if (setLoading) setLoading(true);
+
         try {
             const response = await fetch(`${API_BASE_URL}${endpoint}`, {
                 method: 'POST',
                 headers,
                 body: JSON.stringify(data),
             });
+
             const result = await response.json();
+
             if (result.respCode === '0000') {
-                showSuccess({ code: result.respCode, message: successMsg || result.respMsg || '操作成功', image: successImage });
+                showSuccess({
+                    code: result.respCode,
+                    message: successMsg || result.respMsg || '操作成功',
+                    image: successImage,
+                });
                 return result;
             } else {
                 showError({
@@ -198,7 +233,10 @@ export const useApi = () => {
                 return result;
             }
         } catch (error) {
-            showError({ code: '9999', message: error.message || ERROR_CODE_MAP['9999'] });
+            showError({
+                code: '9999',
+                message: error.message || ERROR_CODE_MAP['9999'],
+            });
             return { respCode: '9999', respMsg: error.message };
         } finally {
             if (setLoading) setLoading(false);

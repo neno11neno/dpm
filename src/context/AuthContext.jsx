@@ -1,35 +1,53 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useMemo, useState } from "react";
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [empNo, setEmpNo] = useState(() => sessionStorage.getItem('empNo') || '');
-  const [empAuth, setEmpAuth] = useState(() => sessionStorage.getItem('empAuth') || '');
+  const [authData, setAuthDataState] = useState(() => ({
+    empNo: "",
+    empAuth: "",
+    empName: "",
+    apiKey: "",
+  }));
 
-  const setAuthData = (empNo, empAuth) => {
-    sessionStorage.setItem('empNo', empNo);
-    sessionStorage.setItem('empAuth', empAuth);
-    setEmpNo(empNo);
-    setEmpAuth(empAuth);
+  // 建議統一用物件參數，比較好維護；也支援你現有的 setAuthData(empNo, empAuth, empName, apiKey)
+  const setAuthData = (empNo, empAuth, empName = "", apiKey = "") => {
+    setAuthDataState({
+      empNo: empNo || "",
+      empAuth: empAuth || "",
+      empName: empName || "",
+      apiKey: apiKey || "",
+    });
   };
 
   const clearAuthData = () => {
-    sessionStorage.clear();
-    setEmpNo('');
-    setEmpAuth('');
+    setAuthDataState({
+      empNo: "",
+      empAuth: "",
+      empName: "",
+      apiKey: "",
+    });
   };
 
-  const isAuthenticated = Boolean(empNo && empAuth && sessionStorage.getItem('X-API-KEY'));
+  const isAuthenticated = Boolean(authData.empNo && authData.empAuth && authData.apiKey);
 
-  return (
-    <AuthContext.Provider value={{ empNo, empAuth, isAuthenticated, setAuthData, clearAuthData }}>
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({
+      authData,
+      empNo: authData.empNo,       // 兼容舊用法
+      empAuth: authData.empAuth,   // 兼容舊用法
+      isAuthenticated,
+      setAuthData,
+      clearAuthData,
+    }),
+    [authData, isAuthenticated]
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
 };
