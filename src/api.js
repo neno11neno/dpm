@@ -10,7 +10,7 @@ export const useApi = () => {
         const apiKey = sessionStorage.getItem('X-API-KEY');
 
         if (!empNo || !apiKey) {
-            showError ? .({
+            showError({
                 code: 'Bad',
                 message: '缺少必要的 Header 資訊',
             });

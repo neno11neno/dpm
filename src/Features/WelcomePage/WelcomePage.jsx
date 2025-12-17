@@ -35,9 +35,10 @@ const WelcomePage = () => {
 
     const fetchEmployeeData = async (authCode) => {
       try {
-        const authCodeUrl = encodeURIComponent(authCode);
-        const url = `${API_BASE_URL}/ssoAuth?authCode=${authCodeUrl}`;
+        const payload = encodeURIComponent(authCode);
+        const url = `${API_BASE_URL}/ssoAuth?authCode=${payload}`;
         const response = await fetch(url);
+
         const data = await response.json();
         if (data?.respCode === "0000" && data.respData) {
           const { empNo, empName, empAuth } = data.respData;
@@ -50,10 +51,10 @@ const WelcomePage = () => {
             .replace(/-/g, "");
           const hashValue = await generateSHA256(formattedDate + empNo);
 
-          sessionStorage.setItem("empNo", empNo);
-          sessionStorage.setItem("empName", empName);
-          sessionStorage.setItem("X-API-KEY", hashValue);
-          sessionStorage.setItem("empAuth", empAuth);
+          sessionStorage.setItem("empNo", btoa(empNo));
+          sessionStorage.setItem("empName", btoa(empName));
+          sessionStorage.setItem("X-API-KEY", btoa(hashValue));
+          sessionStorage.setItem("empAuth", btoa(empAuth));
           setAuthData(empNo, empAuth);
 
           setTimeout(() => {
